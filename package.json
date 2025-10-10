@@ -1,0 +1,46 @@
+{
+  "name": "fastify-twilio-openai-voice-agent",
+  "version": "1.0.0",
+  "description": "Production-ready voice AI agent with Twilio, OpenAI Realtime API, ChromaDB, and MongoDB",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch --clear-screen=false src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write 'src/**/*.ts'",
+    "seed": "tsx knowledge/seed.ts"
+  },
+  "keywords": ["fastify", "twilio", "openai", "voice-ai", "chromadb", "mongodb", "websocket"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fastify/swagger": "^8.15.0",
+    "@fastify/swagger-ui": "^2.1.0",
+    "@fastify/type-provider-typebox": "^4.1.0",
+    "@fastify/websocket": "^9.0.0",
+    "@sinclair/typebox": "^0.32.35",
+    "chromadb": "^1.10.5",
+    "dotenv": "^16.6.1",
+    "fastify": "^4.29.1",
+    "mongodb": "^6.20.0",
+    "openai": "^4.104.0",
+    "pino": "^8.21.0",
+    "pino-pretty": "^10.3.1",
+    "twilio": "^4.23.0",
+    "ws": "^8.18.3",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.20",
+    "@types/ws": "^8.18.1",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.57.1",
+    "nodemon": "^3.1.10",
+    "prettier": "^3.6.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}
