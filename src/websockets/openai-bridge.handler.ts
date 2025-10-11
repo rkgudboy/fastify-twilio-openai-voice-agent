@@ -2,7 +2,6 @@ import { WebSocket } from 'ws';
 import { FastifyInstance } from 'fastify';
 import { env } from '../config/env.js';
 import { MetricsCollector } from '../types/metrics.types.js';
-import { openaiToTwilio } from '../utils/audio.utils.js';
 import { getSystemPrompt } from '../prompts/system-prompt.js';
 import { knowledgeBaseService } from '../services/knowledge-base.service.js';
 
@@ -39,7 +38,7 @@ export async function setupOpenAIBridge(
           instructions: getSystemPrompt(),
           voice: 'alloy',
           input_audio_format: 'pcm16',
-          output_audio_format: 'pcm16',
+          output_audio_format: 'g711_ulaw', // Native mulaw 8kHz output - matches Twilio format
           input_audio_transcription: {
             model: 'whisper-1',
           },
@@ -93,14 +92,13 @@ export async function setupOpenAIBridge(
             if (event.delta && twilioWs.readyState === WebSocket.OPEN) {
               metrics.track('audio_sent');
 
-              // Convert from PCM16 to mulaw for Twilio
-              const mulawAudio = openaiToTwilio(event.delta);
-
+              // OpenAI now outputs g711_ulaw directly (8kHz mulaw)
+              // No conversion needed - forward directly to Twilio
               const twilioMessage = {
                 event: 'media',
                 streamSid: streamSid,
                 media: {
-                  payload: mulawAudio,
+                  payload: event.delta, // Already in base64 mulaw format
                 },
               };
 
