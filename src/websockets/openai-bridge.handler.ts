@@ -14,6 +14,7 @@ const OPENAI_REALTIME_URL = 'wss://api.openai.com/v1/realtime?model=gpt-4o-realt
 export async function setupOpenAIBridge(
   twilioWs: WebSocket,
   callSid: string,
+  streamSid: string,
   metrics: MetricsCollector,
   app: FastifyInstance
 ): Promise<WebSocket> {
@@ -97,7 +98,7 @@ export async function setupOpenAIBridge(
 
               const twilioMessage = {
                 event: 'media',
-                streamSid: callSid,
+                streamSid: streamSid,
                 media: {
                   payload: mulawAudio,
                 },

@@ -6,6 +6,7 @@ import { metricsService } from '../services/metrics.service.js';
 import { setupOpenAIBridge } from './openai-bridge.handler.js';
 import { TwilioMediaStreamMessage } from '../types/session.types.js';
 import { safeJsonParse } from '../utils/validation.utils.js';
+import { twilioToOpenAI } from '../utils/audio.utils.js';
 
 export async function registerMediaStreamHandler(app: FastifyInstance) {
   app.register(async (fastify) => {
@@ -49,7 +50,7 @@ export async function registerMediaStreamHandler(app: FastifyInstance) {
                   metrics.track('call_start');
 
                   // Setup OpenAI bridge
-                  const openaiWs = await setupOpenAIBridge(ws, callSid, metrics, app);
+                  const openaiWs = await setupOpenAIBridge(ws, callSid, streamSid, metrics, app);
 
                   // Create session
                   sessionManagerService.set(callSid, {
@@ -72,14 +73,17 @@ export async function registerMediaStreamHandler(app: FastifyInstance) {
                   const session = sessionManagerService.get(callSid);
                   if (session?.openaiWs && session.openaiWs.readyState === WebSocket.OPEN) {
                     // Forward audio to OpenAI
-                    // The audio payload is base64 encoded mulaw
+                    // The audio payload is base64 encoded mulaw from Twilio
                     session.metrics.track('audio_received');
 
-                    // Send to OpenAI (audio conversion happens in OpenAI bridge)
+                    // Convert from Twilio mulaw 8kHz to OpenAI PCM16 24kHz
+                    const pcm16Audio = twilioToOpenAI(data.media.payload);
+
+                    // Send to OpenAI
                     session.openaiWs.send(
                       JSON.stringify({
                         type: 'input_audio_buffer.append',
-                        audio: data.media.payload, // Will be converted in bridge
+                        audio: pcm16Audio,
                       })
                     );
                   }

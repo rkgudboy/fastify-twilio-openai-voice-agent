@@ -1,5 +1,6 @@
 import Fastify, { FastifyInstance } from 'fastify';
 import websocket from '@fastify/websocket';
+import formbody from '@fastify/formbody';
 import swagger from '@fastify/swagger';
 import swaggerUI from '@fastify/swagger-ui';
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
@@ -30,6 +31,9 @@ export async function buildApp(): Promise<FastifyInstance> {
 
   // Register WebSocket plugin
   await app.register(websocket);
+
+  // Register form body parser for Twilio webhooks
+  await app.register(formbody);
 
   // Register Swagger documentation
   await app.register(swagger, swaggerConfig);

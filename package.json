@@ -12,10 +12,19 @@
     "format": "prettier --write 'src/**/*.ts'",
     "seed": "tsx knowledge/seed.ts"
   },
-  "keywords": ["fastify", "twilio", "openai", "voice-ai", "chromadb", "mongodb", "websocket"],
+  "keywords": [
+    "fastify",
+    "twilio",
+    "openai",
+    "voice-ai",
+    "chromadb",
+    "mongodb",
+    "websocket"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@fastify/formbody": "^7.4.0",
     "@fastify/swagger": "^8.15.0",
     "@fastify/swagger-ui": "^2.1.0",
     "@fastify/type-provider-typebox": "^4.1.0",
