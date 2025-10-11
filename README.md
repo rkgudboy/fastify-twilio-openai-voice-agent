@@ -10,9 +10,6 @@ A production-ready voice AI agent system built with Fastify, Twilio Media Stream
 - 💾 **MongoDB Storage** - Persistent storage for call logs, sessions, and analytics
 - 📚 **Swagger/OpenAPI** - Complete API documentation at `/docs`
 - 📊 **Metrics & Observability** - Built-in performance tracking and health checks
-- 🔒 **Type-Safe** - Full TypeScript with strict mode enabled
-- ⚡ **High Performance** - Fastify-based with clustering support via PM2
-- 🎨 **Production-Ready** - Error handling, logging, validation, and graceful shutdown
 
 ## 🏗️ Architecture
 
@@ -68,7 +65,7 @@ A production-ready voice AI agent system built with Fastify, Twilio Media Stream
 
 ```bash
 # Clone the repository
-git clone <your-repo-url>
+git clone https://github.com/rkgudboy/fastify-twilio-openai-voice-agent.git
 cd fastify-twilio-openai-voice-agent
 
 # Install dependencies
@@ -138,29 +135,6 @@ Open your browser to:
 - `POST /api/voice/status` - Call status updates
 - `WS /api/voice/media-stream` - WebSocket for media streaming
 
-## 🔧 Development
-
-### Project Structure
-
-```
-fastify-twilio-openai-voice-agent/
-├── src/
-│   ├── config/          # Environment & configuration
-│   ├── types/           # TypeScript type definitions
-│   ├── controllers/     # API route handlers
-│   ├── services/        # Business logic
-│   ├── websockets/      # WebSocket handlers
-│   ├── middleware/      # Custom middleware
-│   ├── utils/           # Helper functions
-│   ├── prompts/         # AI system prompts
-│   ├── app.ts           # Fastify app factory
-│   ├── server.ts        # Server lifecycle
-│   └── index.ts         # Entry point
-├── knowledge/           # Knowledge base data & seeding
-├── logs/                # Application logs
-├── dist/                # Compiled JavaScript (gitignored)
-└── chroma_data/         # Vector database (gitignored)
-```
 
 ### Available Scripts
 
@@ -190,135 +164,6 @@ pm2 logs voice-ai-agent
 pm2 stop voice-ai-agent
 ```
 
-## 📞 Configuring Twilio
-
-1. **Purchase a Twilio phone number** with Voice capabilities
-
-2. **Configure Voice webhook** for incoming calls:
-   - URL: `https://your-domain.com/api/voice/incoming`
-   - Method: `POST`
-
-3. **Configure Status callback** (optional):
-   - URL: `https://your-domain.com/api/voice/status`
-   - Method: `POST`
-
-4. **Enable Media Streams** in your Twilio console
-
-## 🧪 Testing
-
-### Test Knowledge Base Search
-
-```bash
-curl -X POST http://localhost:3000/api/knowledge/search \
-  -H "Content-Type: application/json" \
-  -d '{"query": "What are your business hours?", "limit": 3}'
-```
-
-### Test Health Check
-
-```bash
-curl http://localhost:3000/api/health
-```
-
-### Test Call Flow
-
-1. Call your Twilio phone number
-2. Listen to the greeting
-3. Start speaking - the AI will respond
-4. Check logs for WebSocket events and metrics
-
-## 🎯 Key Features Explained
-
-### Audio Processing
-
-The system handles real-time audio conversion between Twilio's mulaw (8kHz) and OpenAI's PCM16 (24kHz) formats:
-
-```
-Twilio (mulaw 8kHz) → Decode → Resample → PCM16 24kHz → OpenAI
-OpenAI (PCM16 24kHz) → Resample → Encode → mulaw 8kHz → Twilio
-```
-
-### Knowledge Base Integration
-
-The AI can search your knowledge base during conversations using function calling:
-
-```typescript
-{
-  "type": "function",
-  "name": "search_knowledge_base",
-  "description": "Search for relevant information",
-  "parameters": {
-    "query": "user's question"
-  }
-}
-```
-
-### Metrics Collection
-
-Track performance metrics for every call:
-- Round-trip latency (audio → response)
-- Call duration
-- Knowledge searches performed
-- Function calls executed
-- Audio packets sent/received
-
-## 📊 Monitoring
-
-### Health Checks
-
-The `/api/health` endpoint provides:
-- Server uptime
-- Memory usage
-- Active call count
-- Database connection status
-
-### Metrics
-
-The `/api/metrics` endpoint provides:
-- Active/total calls
-- Average/P95/P99 latencies
-- Recent call history
-
-### Logs
-
-Structured JSON logs with Pino:
-```json
-{
-  "level": "info",
-  "time": "2025-10-11T...",
-  "callSid": "CA123...",
-  "msg": "Media stream started"
-}
-```
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-**MongoDB connection failed**
-```bash
-# Ensure MongoDB is running
-mongod --version
-# Or use MongoDB Atlas URI
-```
-
-**ChromaDB initialization error**
-```bash
-# Clear ChromaDB data
-rm -rf chroma_data/
-npm run seed
-```
-
-**Twilio WebSocket connection fails**
-- Ensure your server is publicly accessible (use ngrok for local dev)
-- Check that webhook URL uses `wss://` protocol
-- Verify Twilio credentials in `.env`
-
-**OpenAI API errors**
-- Verify API key is valid
-- Check API rate limits
-- Ensure model name is correct
-
 ## 📝 Environment Variables
 
 | Variable | Required | Default | Description |
@@ -336,3 +181,5 @@ npm run seed
 | `CHROMA_PATH` | No | `./chroma_data` | ChromaDB storage path |
 | `LOG_LEVEL` | No | `info` | Logging level |
 | `MAX_CONCURRENT_CALLS` | No | `100` | Max concurrent calls |
+
+---
