@@ -33,10 +33,8 @@ export async function registerVoiceRoutes(app: FastifyInstance) {
 
       const response = new VoiceResponse();
 
-      // Greet the caller
-      response.say('Hello! Please wait while I connect you to our AI assistant.');
-
-      // Connect to media stream
+      // Connect immediately to media stream - no announcement delay
+      // The AI will greet the caller proactively
       const connect = response.connect();
       const host = request.headers.host;
 

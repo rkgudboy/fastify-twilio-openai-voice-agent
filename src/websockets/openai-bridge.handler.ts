@@ -45,8 +45,8 @@ export async function setupOpenAIBridge(
           turn_detection: {
             type: 'server_vad',
             threshold: 0.5,
-            prefix_padding_ms: 300,
-            silence_duration_ms: 500,
+            prefix_padding_ms: 200,      // Reduced from 300ms for faster response
+            silence_duration_ms: 300,    // Reduced from 500ms for snappier feel
           },
           tools: [
             {
@@ -69,6 +69,32 @@ export async function setupOpenAIBridge(
       };
 
       openaiWs.send(JSON.stringify(sessionConfig));
+
+      // Send proactive greeting immediately - don't wait for user input
+      // This makes the AI greet the caller as soon as they connect
+      const greetingMessage = {
+        type: 'conversation.item.create',
+        item: {
+          type: 'message',
+          role: 'user',
+          content: [
+            {
+              type: 'input_text',
+              text: 'Say a brief, friendly greeting to welcome the caller. Keep it under 10 words.'
+            }
+          ]
+        }
+      };
+
+      openaiWs.send(JSON.stringify(greetingMessage));
+
+      // Trigger the response immediately
+      const createResponse = {
+        type: 'response.create'
+      };
+
+      openaiWs.send(JSON.stringify(createResponse));
+
       metrics.track('openai_connected');
       isReady = true;
       resolve(openaiWs);
