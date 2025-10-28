@@ -1,107 +1,92 @@
-# Voice AI Agent - Fastify Implementation
+# 🎙️ Fastify Twilio OpenAI Voice Agent
 
-A production-ready Fastify backend for real-time voice conversations using Twilio telephony, OpenAI APIs (Whisper, GPT-4o, TTS), ChromaDB vector search, and MongoDB persistence.
+A production-ready voice AI agent system built with Fastify, Twilio Media Streams, OpenAI APIs (Whisper, GPT-4o, TTS), ChromaDB vector database, and MongoDB. Features real-time conversational AI with semantic knowledge base search, function calling capabilities, and comprehensive API documentation.
 
-## Features
+## ✨ Features
 
-- 🎙️ **Real-time Voice Conversations** via Twilio telephony
-- 🤖 **OpenAI Integration**
-  - Speech-to-Text (Whisper API)
-  - Language Model (GPT-4o) with **Function Calling**
-  - Text-to-Speech (TTS API)
-- 🔍 **Knowledge Base** with ChromaDB vector search
-- 💾 **Persistent Storage** with MongoDB
-- 🎯 **Voice Activity Detection** (VAD)
-- 📊 **Analytics & Monitoring**
-- 📚 **Swagger UI** - Interactive API documentation
-- 🚀 **WebSocket Support** for real-time media streaming
-- 🐳 **Docker Support** for easy deployment
+- 🎯 **Real-time Voice AI** - Sub-second latency voice conversations with VAD-based speech detection
+- 📞 **Twilio Integration** - PSTN connectivity with WebSocket media streaming
+- 🤖 **OpenAI AI Pipeline** - Whisper (STT), GPT-4o (LLM with function calling), TTS (speech synthesis)
+- 🧠 **Semantic Search** - ChromaDB vector database for intelligent knowledge retrieval
+- 💾 **MongoDB Storage** - Persistent storage for call logs, sessions, transcripts, and analytics
+- 📚 **Swagger/OpenAPI** - Complete API documentation at `/docs`
+- 🔧 **Function Calling** - LLM can invoke tools (knowledge search, call history, etc.)
+- 📊 **Metrics & Observability** - Built-in performance tracking and health checks
+- 🐳 **Docker Support** - Complete containerization with Docker Compose
 
-## Architecture
-
-This implementation follows the PDF specification with:
-- **Fastify** REST API server (Node.js)
-- **Sequential Pipeline**: STT → LLM → TTS
-- **Function Calling**: LLM can call tools (search knowledge base, get call history, etc.)
-- **WebSocket**: Real-time audio streaming from Twilio
-- **VAD**: Threshold-based voice activity detection
-- **Knowledge Retrieval**: RAG with ChromaDB for context-aware responses
-
-## Tech Stack
-
-- **Framework**: Fastify 4.x
-- **Telephony**: Twilio
-- **AI Services**: OpenAI (Whisper, GPT-4o, TTS)
-- **Vector DB**: ChromaDB
-- **Database**: MongoDB
-- **Audio Processing**: Native Node.js Buffer operations
-- **WebSocket**: @fastify/websocket
-- **Runtime**: Node.js 20+
-
-## Project Structure
+## 🏗️ Architecture
 
 ```
-fastify-implementation/
-├── src/
-│   ├── server.js                    # Fastify server entry point
-│   ├── config/
-│   │   └── config.js                # Configuration management
-│   ├── routes/
-│   │   ├── twilio.routes.js         # Twilio webhooks
-│   │   ├── knowledge.routes.js      # Knowledge base CRUD
-│   │   └── analytics.routes.js      # Analytics endpoints
-│   ├── services/
-│   │   ├── openai.service.js        # OpenAI API integration
-│   │   ├── mongodb.service.js       # MongoDB operations
-│   │   └── chromadb.service.js      # Vector database service
-│   ├── websocket/
-│   │   ├── connection-manager.js    # WebSocket session management
-│   │   └── session.js               # Session state & audio buffering
-│   ├── utils/
-│   │   ├── audio-processor.js       # Audio format conversion
-│   │   └── vad-detector.js          # Voice Activity Detection
-│   └── functions/
-│       └── tools.js                 # Function calling definitions
-├── docker-compose.yml               # Multi-container setup
-├── Dockerfile                       # API container
-├── package.json                     # Dependencies
-├── .env.example                     # Environment template
-├── Makefile                         # Common commands
-└── README.md                        # This file
+┌─────────────┐
+│  PSTN Call  │
+└──────┬──────┘
+       │
+       ▼
+┌──────────────────────┐
+│   Twilio Media       │
+│   Streams (mulaw)    │
+└──────┬───────────────┘
+       │
+       ▼
+┌────────────────────────────────────┐
+│   Fastify API Server               │
+│   ├─ REST API (Swagger)            │
+│   ├─ WebSocket Handler             │
+│   ├─ Audio Conversion (mulaw↔PCM)  │
+│   ├─ VAD Detection                 │
+│   └─ Session Management            │
+└──────┬─────────────────────────────┘
+       │
+       ├──▶ OpenAI APIs (Whisper, GPT-4o, TTS)
+       ├──▶ ChromaDB (Vector Search & RAG)
+       └──▶ MongoDB (Persistent Data)
 ```
 
-## Prerequisites
+**Pipeline Flow:** Twilio (mulaw) → WebSocket → VAD → Whisper (STT) → GPT-4o (LLM + Function Calls) → TTS → mulaw → Twilio
 
-- Node.js 20+
-- MongoDB
-- Twilio Account
-- OpenAI API Key
+## 📦 Tech Stack
+
+| Component | Technology | Purpose |
+|-----------|-----------|---------|
+| **Runtime** | Node.js 22+ | Server-side JavaScript |
+| **Framework** | Fastify 5.x | Fast, low-overhead web framework |
+| **Voice** | Twilio Media Streams | PSTN connectivity & audio streaming |
+| **AI** | OpenAI APIs | Whisper (STT), GPT-4o (LLM), TTS |
+| **Vector DB** | ChromaDB | Semantic knowledge base search (RAG) |
+| **Database** | MongoDB | Persistent data storage |
+| **Docs** | Swagger/OpenAPI 3.0 | Interactive API documentation |
+| **Logger** | Pino | Fast structured logging |
+| **WebSocket** | @fastify/websocket | Real-time bidirectional communication |
+| **Docker** | Docker Compose | Containerization & orchestration |
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 22+ (with ES modules support)
+- MongoDB (local or Atlas)
+- Twilio account with phone number
+- OpenAI API key
 - (Optional) Docker & Docker Compose
 
-## Installation
-
-### 1. Clone Repository
+### 1. Installation
 
 ```bash
+# Navigate to directory
 cd fastify-implementation
-```
 
-### 2. Install Dependencies
-
-```bash
+# Install dependencies
 npm install
 # or
 make install
-```
 
-### 3. Configure Environment
-
-```bash
+# Copy environment template
 cp .env.example .env
-# Edit .env with your credentials
 ```
 
-Required environment variables:
+### 2. Configuration
+
+Edit `.env` with your credentials:
 
 ```env
 # Twilio
@@ -110,7 +95,7 @@ TWILIO_AUTH_TOKEN=your_auth_token
 TWILIO_PHONE_NUMBER=+1234567890
 
 # OpenAI
-OPENAI_API_KEY=your_openai_api_key
+OPENAI_API_KEY=sk-your-key-here
 
 # MongoDB
 MONGODB_URL=mongodb://localhost:27017
@@ -120,7 +105,7 @@ MONGODB_DB_NAME=voice_agent_db
 CHROMADB_URL=http://localhost:8000
 ```
 
-### 4. Start Services
+### 3. Start Services
 
 #### Option A: Using Docker Compose (Recommended)
 
@@ -135,7 +120,7 @@ This starts:
 - ChromaDB on port 8000
 - Fastify API on port 3000
 
-#### Option B: Manual Setup
+#### Option B: Manual Development
 
 Start MongoDB and ChromaDB separately, then:
 
@@ -145,64 +130,50 @@ npm run dev
 make dev
 ```
 
-## Usage
+### 4. View API Documentation
 
-### API Endpoints
+Open your browser to:
+- **Swagger UI**: http://localhost:3000/docs
+- **Health Check**: http://localhost:3000/health
+- **Metrics**: http://localhost:3000/api/v1/analytics/system
 
-The server will be available at `http://localhost:3000`
+## 📖 API Endpoints
 
-#### Interactive API Documentation (Swagger UI)
+### Health & Monitoring
 
-Access the interactive API documentation at:
+- `GET /health` - Health check with database connectivity
+- `GET /api/v1/analytics/system` - System metrics and performance stats
+- `GET /api/v1/analytics/dashboard` - Dashboard data with call statistics
 
-**http://localhost:3000/docs**
+### Knowledge Base
 
-Swagger UI provides:
-- 📖 Complete API documentation
-- 🧪 Interactive testing of all endpoints
-- 📝 Request/response schemas
-- 🎯 Example requests and responses
-- 🔍 Search and filter endpoints by tags
+- `GET /api/v1/knowledge/documents` - List all knowledge documents
+- `POST /api/v1/knowledge/search` - Semantic search with query
+- `POST /api/v1/knowledge/documents` - Create new document
+- `POST /api/v1/knowledge/documents/bulk` - Bulk import documents
+- `PUT /api/v1/knowledge/documents/:id` - Update document
+- `DELETE /api/v1/knowledge/documents/:id` - Delete document
 
-#### Health Check
+### Voice (Twilio Webhooks)
 
-```bash
-curl http://localhost:3000/health
-```
-
-#### Twilio Webhooks
-
-- `POST /api/v1/twilio/incoming` - Handle incoming calls
+- `POST /api/v1/twilio/incoming` - Incoming call webhook (returns TwiML)
 - `POST /api/v1/twilio/status` - Call status updates
 - `GET /api/v1/twilio/call/:callSid` - Get call details
-- `GET /api/v1/twilio/call/:callSid/transcript` - Get transcript
+- `GET /api/v1/twilio/call/:callSid/transcript` - Get call transcript
 - `GET /api/v1/twilio/calls/recent` - List recent calls
+- `WS /ws/media/:callSid` - WebSocket for real-time media streaming
 
-#### Knowledge Base
+### Analytics
 
-- `POST /api/v1/knowledge/documents` - Add document
-- `POST /api/v1/knowledge/documents/bulk` - Bulk add
-- `POST /api/v1/knowledge/search` - Search
-- `GET /api/v1/knowledge/documents` - List all
-- `PUT /api/v1/knowledge/documents/:id` - Update
-- `DELETE /api/v1/knowledge/documents/:id` - Delete
+- `GET /api/v1/analytics/call/:callSid` - Individual call analytics and metrics
 
-#### Analytics
 
-- `GET /api/v1/analytics/system` - System metrics
-- `GET /api/v1/analytics/call/:callSid` - Call analytics
-- `GET /api/v1/analytics/dashboard` - Dashboard data
+### Testing Locally with Twilio
 
-#### WebSocket
-
-- `WS /ws/media/:callSid` - Real-time media streaming
-
-### Configure Twilio
-
-#### For Development (using ngrok)
+For development, use ngrok to expose your local server:
 
 ```bash
-# Start ngrok
+# Start ngrok tunnel
 ngrok http 3000
 
 # Configure Twilio webhook (in Twilio Console):
@@ -211,98 +182,118 @@ ngrok http 3000
 # HTTP: POST
 
 # Status callback:
-# https://YOUR_NGROK_URL/api/v1/twilio/status
+# URL: https://YOUR_NGROK_URL/api/v1/twilio/status
+# HTTP: POST
 ```
 
-#### For Production
+For production, deploy to a server with HTTPS and configure your domain in Twilio.
 
-Deploy to a server with HTTPS and use your domain in Twilio webhook configuration.
+## 🔄 Call Flow Architecture
 
-## Call Flow
+1. **Call Initiation**: User calls Twilio number → POST to `/api/v1/twilio/incoming`
+2. **TwiML Response**: Backend returns TwiML with WebSocket URL (`wss://domain/ws/media/{callSid}`)
+3. **WebSocket Connection**: Twilio establishes connection, handled by `ConnectionManager`
+4. **Audio Streaming Loop**:
+   - Twilio sends mulaw audio chunks via WebSocket
+   - Audio buffered and converted: mulaw → PCM16
+   - VAD detects speech end (configurable silence threshold)
+   - When speech ends: processing pipeline triggers
+5. **AI Processing Pipeline** (sequential):
+   - **Transcribe**: Convert PCM → WAV, send to Whisper API
+   - **Search**: Query ChromaDB for relevant context (RAG)
+   - **Generate**: Send transcript + context to GPT-4o (may invoke functions)
+   - **Synthesize**: Convert response text to speech via TTS API
+   - **Send**: Convert to mulaw and stream back via WebSocket
+6. **Termination**: Call ends → session cleaned up, transcript saved to MongoDB
 
-1. User calls Twilio number
-2. Twilio sends webhook to `/api/v1/twilio/incoming`
-3. Backend returns TwiML with WebSocket URL
-4. Twilio establishes WebSocket connection
-5. Audio streaming begins:
-   - Twilio sends mulaw audio chunks
-   - Backend converts to PCM
-   - VAD detects speech end
-   - Audio transcribed with Whisper
-6. Knowledge base searched for context
-7. GPT-4o generates response (may call functions)
-8. Response converted to speech with TTS
-9. Audio sent back to caller
-10. Call ends, transcript saved to MongoDB
+### Function Calling
 
-## Function Calling
+The LLM has access to these tool functions (defined in `src/functions/tools.js`):
 
-The LLM has access to these functions:
+- **`search_knowledge_base(query)`** - Search ChromaDB for information
+- **`get_call_history(phone_number)`** - Retrieve previous call history
+- **`get_current_time()`** - Get current date/time
 
-- **search_knowledge_base(query)** - Search ChromaDB for information
-- **get_call_history(phone_number)** - Retrieve call history
-- **get_current_time()** - Get current date/time
+To add more functions, update the tools definition in `src/functions/tools.js` and implement handlers.
 
-Add more functions in `src/functions/tools.js`
+### Audio Processing Pipeline
 
-## Audio Processing
+**Format Flow**: Twilio (mulaw 8kHz) → PCM16 → WAV → Whisper → Text → GPT-4o → Text → TTS → mulaw → Twilio
 
-**Pipeline**: Twilio (mulaw 8kHz) → PCM16 → WAV → Whisper → Text → GPT-4 → Text → TTS → mulaw → Twilio
+**Voice Activity Detection (VAD)**:
+- Threshold-based detection using RMS energy calculation
+- Configurable via `VAD_THRESHOLD` (0.0-1.0, higher = less sensitive)
+- `SILENCE_DURATION` determines when speech ends (default: 1.5s)
+- Prevents cutoff while allowing responsive interactions
 
-**VAD**: Threshold-based detection using RMS energy calculation
-- Configurable via `VAD_THRESHOLD` (0-1)
-- `SILENCE_DURATION` determines when speech ends
+## 📊 Performance & Scaling
 
-## Performance
+### Latency Breakdown (per interaction)
 
-**Latency per response**: ~500-1500ms
-- Network (User ↔ Twilio): 20-100ms
-- Network (Twilio ↔ Server): 10-50ms
-- Network (Server ↔ OpenAI): 20-100ms
-- Audio Processing: 5-10ms
-- VAD Detection: 200-300ms
-- Whisper Transcription: 200-500ms
-- Knowledge Search: 100-300ms
-- GPT-4 Generation: 200-500ms
-- TTS Generation: 200-500ms
+**Total Response Time**: ~500-1500ms
 
-**Bottlenecks at 1000+ calls**:
-- WebSocket sessions (no load balancer)
-- MongoDB connection pool (10 max)
-- In-memory sessions (no cross-instance sharing)
+| Stage | Latency |
+|-------|---------|
+| Network (User ↔ Twilio) | 20-100ms |
+| Network (Twilio ↔ Server) | 10-50ms |
+| Network (Server ↔ OpenAI) | 20-100ms |
+| Audio Processing | 5-10ms |
+| VAD Detection (silence wait) | 200-300ms |
+| Whisper Transcription | 200-500ms |
+| ChromaDB Search | 100-300ms |
+| GPT-4o Generation | 200-500ms |
+| TTS Generation | 200-500ms |
+
+### Scaling Considerations
+
+**Current Bottlenecks** (at 1000+ concurrent calls):
+- In-memory session storage (doesn't scale across instances)
+- WebSocket sticky sessions required (no built-in load balancing)
+- MongoDB connection pool limits (default: 10)
+- Single-instance architecture
 
 **Scaling Solutions**:
-- Redis for distributed sessions
-- NGINX/ALB with WebSocket sticky sessions
-- Horizontal scaling with multiple instances
-- Increase MongoDB connection pool
+1. **Session Management**: Use Redis for distributed session storage
+2. **Load Balancing**: NGINX/ALB with WebSocket sticky sessions enabled
+3. **Horizontal Scaling**: Deploy multiple instances behind load balancer
+4. **Database**: Increase MongoDB connection pool (`MONGODB_MAX_POOL_SIZE`)
+5. **Caching**: Add response caching for common queries
 
-## Development
+**Not Yet Implemented**:
+- Streaming responses (to reduce perceived latency)
+- Interrupt handling (mid-response cancellation)
+- Redis session store (for multi-instance deployment)
+- Request signature validation (currently disabled)
 
-### Common Commands
+## 🔧 Configuration
 
-```bash
-# Install dependencies
-make install
+### Environment Variables
 
-# Run in development mode (auto-reload)
-make dev
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `NODE_ENV` | No | `development` | Environment mode |
+| `PORT` | No | `3000` | Server port |
+| `HOST` | No | `0.0.0.0` | Server host |
+| `TWILIO_ACCOUNT_SID` | Yes | - | Twilio account SID |
+| `TWILIO_AUTH_TOKEN` | Yes | - | Twilio auth token |
+| `TWILIO_PHONE_NUMBER` | Yes | - | Twilio phone number |
+| `OPENAI_API_KEY` | Yes | - | OpenAI API key |
+| `OPENAI_MODEL` | No | `gpt-4o` | GPT model for conversations |
+| `OPENAI_TTS_VOICE` | No | `alloy` | TTS voice (alloy, echo, fable, onyx, nova, shimmer) |
+| `OPENAI_TEMPERATURE` | No | `0.7` | LLM temperature (0.0-2.0) |
+| `MONGODB_URL` | No | `mongodb://localhost:27017` | MongoDB connection URI |
+| `MONGODB_DB_NAME` | No | `voice_agent_db` | MongoDB database name |
+| `CHROMADB_URL` | No | `http://localhost:8000` | ChromaDB server URL |
+| `VAD_THRESHOLD` | No | `0.5` | Voice activity threshold (0.0-1.0) |
+| `SILENCE_DURATION` | No | `1.5` | Silence duration before processing (seconds) |
+| `MAX_RECORDING_DURATION` | No | `30` | Max recording length (seconds) |
+| `MAX_SESSIONS` | No | `1000` | Max concurrent sessions |
+| `SESSION_TIMEOUT` | No | `3600` | Session timeout (seconds) |
+| `LOG_LEVEL` | No | `info` | Logging level (trace, debug, info, warn, error) |
 
-# Run in production mode
-make start
+### Example API Usage
 
-# Docker commands
-make docker-up        # Start all services
-make docker-down      # Stop all services
-make docker-logs      # View logs
-make docker-restart   # Restart API container
-
-# Clean
-make clean
-```
-
-### Adding Knowledge Base Documents
-
+**Add Knowledge Base Document**:
 ```bash
 curl -X POST "http://localhost:3000/api/v1/knowledge/documents" \
   -H "Content-Type: application/json" \
@@ -312,69 +303,44 @@ curl -X POST "http://localhost:3000/api/v1/knowledge/documents" \
   }'
 ```
 
-### Searching Knowledge Base
-
+**Search Knowledge Base**:
 ```bash
 curl -X POST "http://localhost:3000/api/v1/knowledge/search" \
   -H "Content-Type: application/json" \
-  -d '{
-    "query": "business hours",
-    "top_k": 3
-  }'
+  -d '{"query": "business hours", "top_k": 3}'
 ```
 
-## Configuration
-
-Key settings in `.env`:
-
-```env
-# Audio Processing
-VAD_THRESHOLD=0.5              # 0-1, higher = less sensitive
-SILENCE_DURATION=1.5           # Seconds before processing
-MAX_RECORDING_DURATION=30      # Max seconds per utterance
-
-# OpenAI
-OPENAI_MODEL=gpt-4o            # LLM model
-OPENAI_TTS_VOICE=alloy         # Voice: alloy, echo, fable, onyx, nova, shimmer
-OPENAI_TEMPERATURE=0.7         # 0-2, controls creativity
-
-# Session
-MAX_SESSIONS=1000              # Max concurrent sessions
-SESSION_TIMEOUT=3600           # Session timeout in seconds
-```
-
-## Monitoring
-
-### System Health
-
-```bash
-curl http://localhost:3000/health
-```
-
-### Analytics Dashboard
-
-```bash
-curl http://localhost:3000/api/v1/analytics/dashboard
-```
-
-### View Recent Calls
-
+**View Recent Calls**:
 ```bash
 curl http://localhost:3000/api/v1/twilio/calls/recent
 ```
 
-## Docker Deployment
+**Get Call Transcript**:
+```bash
+curl http://localhost:3000/api/v1/twilio/call/{callSid}/transcript
+```
+
+**Check System Health**:
+```bash
+curl http://localhost:3000/health
+```
+
+## 🐳 Docker Deployment
 
 ### Build and Run
 
 ```bash
+# Start all services (MongoDB, ChromaDB, API)
 docker-compose up -d
-```
 
-### View Logs
-
-```bash
+# View logs
 docker-compose logs -f api
+
+# Stop all services
+docker-compose down
+
+# Restart API only
+docker-compose restart api
 ```
 
 ### Scale API Instances
@@ -383,86 +349,30 @@ docker-compose logs -f api
 docker-compose up -d --scale api=3
 ```
 
-Note: For multiple instances, you'll need a load balancer with sticky sessions.
 
-## Troubleshooting
+## 🏛️ Architecture Notes
 
-### WebSocket Connection Fails
+### Key Implementation Patterns
 
-- Ensure domain supports WebSocket connections
-- Check firewall rules
-- Verify Twilio can reach your WebSocket URL
-- Use `wss://` for HTTPS domains, `ws://` for HTTP
+**Session Management**: Each call gets a `CallSession` object stored in `ConnectionManager.active_sessions`. Sessions are in-memory and don't persist across server restarts.
 
-### Audio Quality Issues
+**Audio Pipeline**: All audio flows through format conversions:
+- Twilio uses mulaw at 8kHz (telephony standard)
+- OpenAI Whisper expects WAV/MP3
+- TTS returns audio that we convert back to mulaw
 
-- Check sample rate (default: 8kHz)
-- Verify audio conversion pipeline
-- Adjust VAD threshold
+**Voice Activity Detection**: Simple threshold-based RMS energy calculation. Tracks speech/silence and triggers processing after `SILENCE_DURATION` of silence.
 
-### High Latency
+**Knowledge Base RAG**: ChromaDB provides vector search for Retrieval-Augmented Generation. Context is retrieved before GPT-4o generation to ground responses.
 
-- Check network latency to OpenAI
-- Optimize knowledge base queries
-- Adjust `SILENCE_DURATION` for faster/slower response
 
-### MongoDB Connection Errors
+## 📧 Support
 
-- Verify MongoDB is running
-- Check connection string
-- Increase connection pool size
+For issues and questions:
+- Check logs: `make docker-logs` or `docker-compose logs -f api`
+- Review health endpoint: `http://localhost:3000/health`
+- Verify environment variables in `.env`
+- Check Swagger docs: `http://localhost:3000/docs`
+- Review call transcripts: `/api/v1/twilio/calls/recent`
 
-## Production Considerations
-
-1. **Security**
-   - Enable HTTPS
-   - Validate Twilio webhooks
-   - Secure MongoDB with authentication
-   - Use secrets management
-
-2. **Monitoring**
-   - Set up logging aggregation
-   - Monitor WebSocket connections
-   - Track latency metrics
-   - Configure alerts
-
-3. **Scaling**
-   - Use Redis for sessions
-   - Deploy behind load balancer
-   - Scale MongoDB replica set
-   - Implement rate limiting
-
-4. **Reliability**
-   - Add retry logic
-   - Implement circuit breakers
-   - Add request timeouts
-   - Handle graceful degradation
-
-## Differences from FastAPI Implementation
-
-This Fastify implementation:
-- Uses Node.js instead of Python
-- Same architecture (STT → LLM → TTS)
-- **Adds function calling** (not in FastAPI version)
-- Same audio processing pipeline
-- Compatible API endpoints
-- Runs on port 3000 (instead of 8000)
-
-## License
-
-MIT
-
-## Support
-
-For issues:
-- Check logs: `make docker-logs`
-- Review health: `http://localhost:3000/health`
-- Verify environment variables
-
-## Acknowledgments
-
-- Fastify framework
-- Twilio telephony
-- OpenAI AI capabilities
-- ChromaDB vector search
-- MongoDB data persistence
+---
