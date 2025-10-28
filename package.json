@@ -1,16 +1,15 @@
 {
   "name": "fastify-twilio-openai-voice-agent",
   "version": "1.0.0",
-  "description": "Production-ready voice AI agent with Twilio, OpenAI Realtime API, ChromaDB, and MongoDB",
+  "description": "Voice AI agent with Twilio, OpenAI Realtime API, ChromaDB, and MongoDB",
+  "main": "src/server.js",
   "type": "module",
-  "main": "dist/index.js",
   "scripts": {
-    "dev": "tsx watch --clear-screen=false src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "lint": "eslint src --ext .ts",
-    "format": "prettier --write 'src/**/*.ts'",
-    "seed": "tsx knowledge/seed.ts"
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f"
   },
   "keywords": [
     "fastify",
@@ -22,34 +21,25 @@
     "websocket"
   ],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
-    "@fastify/formbody": "^7.4.0",
-    "@fastify/swagger": "^8.15.0",
-    "@fastify/swagger-ui": "^2.1.0",
-    "@fastify/type-provider-typebox": "^4.1.0",
-    "@fastify/websocket": "^9.0.0",
-    "@sinclair/typebox": "^0.32.35",
-    "chromadb": "^1.10.5",
-    "dotenv": "^16.6.1",
-    "fastify": "^4.29.1",
-    "mongodb": "^6.20.0",
-    "openai": "^4.104.0",
-    "pino": "^8.21.0",
-    "pino-pretty": "^10.3.1",
-    "twilio": "^4.23.0",
-    "ws": "^8.18.3",
-    "zod": "^3.25.76"
+    "fastify": "5.6.1",
+    "@fastify/websocket": "11.2.0",
+    "@fastify/cors": "11.1.0",
+    "@fastify/env": "5.0.3",
+    "@fastify/swagger": "9.5.2",
+    "@fastify/swagger-ui": "5.2.3",
+    "twilio": "5.10.4",
+    "openai": "6.7.0",
+    "mongodb": "6.20.0",
+    "chromadb": "3.0.17",
+    "ws": "8.18.3",
+    "pino": "10.1.0",
+    "pino-pretty": "13.1.2",
+    "dotenv": "17.2.3"
   },
-  "devDependencies": {
-    "@types/node": "^20.19.20",
-    "@types/ws": "^8.18.1",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
-    "@typescript-eslint/parser": "^6.21.0",
-    "eslint": "^8.57.1",
-    "nodemon": "^3.1.10",
-    "prettier": "^3.6.2",
-    "tsx": "^4.20.6",
-    "typescript": "^5.9.3"
+  "devDependencies": {},
+  "engines": {
+    "node": ">=22.0.0"
   }
 }
